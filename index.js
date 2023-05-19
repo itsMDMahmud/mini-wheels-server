@@ -43,6 +43,17 @@ async function run() {
         res.send(result);
     })
 
+    //bookings routes
+    app.get('/bookings', verifyJWT, async(req, res) => { 
+      if (decoded.email !== req.query.email) {
+          return res.status(403).send({error: 1, message: 'forbidden access'})
+        }
+
+         
+        const result = await bookingCollection.find(query).toArray();
+        res.send(result);
+    })
+
     app.post('/toylist', async(req, res) => {
         const addAToy = req.body;
         console.log(addAToy);
@@ -69,3 +80,8 @@ app.get ('/', (req, res) => {
 app.listen(port, () => {
     console.log(`Mini server is running on port: ${port}`)
 })
+
+// let query = {};
+//         if (req.query?.email) {
+//             query = {email: req.query.email}
+//         }
