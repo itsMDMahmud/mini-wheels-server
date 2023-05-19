@@ -73,7 +73,7 @@ async function run() {
   
     app.post('/mytoys', async(req, res) => {
         const addAToy = req.body;
-        console.log(addAToy);
+        // console.log(addAToy);
         const result = await toysCollection.insertOne(addAToy);
         res.send(result);
     })
@@ -82,7 +82,7 @@ async function run() {
       const _id = req.params._id;
       const filter = {_id: new ObjectId(_id)}
       const updateDetails = req.body;
-      console.log(updateDetails);
+      // console.log(updateDetails);
       const updatedToyDetails ={
         $set: {
           toyName: req.body.toyName, 
