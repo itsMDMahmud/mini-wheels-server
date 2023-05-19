@@ -43,22 +43,32 @@ async function run() {
         res.send(result);
     })
 
-    //bookings routes
-    app.get('/bookings', verifyJWT, async(req, res) => { 
-      if (decoded.email !== req.query.email) {
-          return res.status(403).send({error: 1, message: 'forbidden access'})
-        }
+    //get data with specific user email
 
-         
-        const result = await bookingCollection.find(query).toArray();
-        res.send(result);
+    app.get('/mytoys', async(req, res) => {
+      // console.log(req.query);
+      let query = {};
+      if (req.query?.email) {
+          query = {email: req.query.email}
+      }       
+      
+      const result = await toysCollection.find(query).toArray();
+      res.send(result);
     })
+
 
     app.post('/toylist', async(req, res) => {
         const addAToy = req.body;
         console.log(addAToy);
         const result = await toysCollection.insertOne(addAToy);
         res.send(result);
+    })
+
+    app.delete('/mytoys/:_id', async (req, res) => {
+      const _id = req.params._id;
+      const query = {_id: new ObjectId(_id)}
+      const result = await toysCollection.deleteOne(query);
+      res.send(result);
     })
 
     // Send a ping to confirm a successful connection
@@ -81,7 +91,3 @@ app.listen(port, () => {
     console.log(`Mini server is running on port: ${port}`)
 })
 
-// let query = {};
-//         if (req.query?.email) {
-//             query = {email: req.query.email}
-//         }
