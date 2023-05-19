@@ -56,12 +56,41 @@ async function run() {
       res.send(result);
     })
 
+    app.get('/mytoys', async(req, res) => {
+      const cursor = toysCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+  })
 
-    app.post('/toylist', async(req, res) => {
+    app.get('/mytoys/:_id', async(req, res) => {
+      const _id =  req.params._id;
+      const query = {_id: new ObjectId(_id)}
+      const result = await toysCollection.findOne(query);
+      // const result = await cursor.toArray();
+      res.send(result);
+  })
+
+  
+    app.post('/mytoys', async(req, res) => {
         const addAToy = req.body;
         console.log(addAToy);
         const result = await toysCollection.insertOne(addAToy);
         res.send(result);
+    })
+
+    app.patch('/mytoys/:_id', async (req, res) => {
+      const _id = req.params._id;
+      const filter = {_id: new ObjectId(_id)}
+      const updateDetails = req.body;
+      console.log(updateDetails);
+      const updatedToyDetails ={
+        $set: {
+          toyName: req.body.toyName, 
+          categoryName: req.body.toyName, 
+        }
+      }
+      const result = await toysCollection.updateOne(filter, updatedToyDetails);
+      res.send(result);
     })
 
     app.delete('/mytoys/:_id', async (req, res) => {
