@@ -29,11 +29,32 @@ async function run() {
 
     const toysCollection = client.db('miniWheels').collection('toyList');
 
+    const indexKeys = {toyName: 1, categoryName: 1};
+    const indexOptions = {name: "nameCategory"};
+
+    const result = await toysCollection.createIndex(indexKeys, indexOptions);
+
+    app.get("/toysearchTitle/:text", async (req, res) => {
+      const searchText = req.params.text;
+
+      const result = await toysCollection
+      .find({
+        $or: [
+          {toyName: {$regex: searchText, $options: "i"}},
+          {categoryName: {$regex: searchText, $options: "i"}},
+        ],
+      })
+      .toArray();
+      res.send(result);
+    });
+    
+
     app.get('/toylist', async(req, res) => {
         const cursor = toysCollection.find();
         const result = await cursor.toArray();
         res.send(result);
     })
+
 
     app.get('/toylist/:id', async(req, res) => {
         const id = req.params.id;
@@ -43,18 +64,26 @@ async function run() {
         res.send(result);
     })
 
-    //get data with specific user email
 
-    app.get('/mytoys', async(req, res) => {
-      // console.log(req.query);
+    app.get('/mytoys', async (req, res) => {
       let query = {};
       if (req.query?.email) {
-          query = {email: req.query.email}
-      }       
-      
-      const result = await toysCollection.find(query).toArray();
+        query = { email: req.query.email };
+      }
+    
+      let sortOrder = 1; // 1 for ascending, -1 for descending
+      if (req.query?.sort === 'desc') {
+        sortOrder = -1;
+      }
+    
+      const result = await toysCollection
+        .find(query)
+        .sort({ price: sortOrder }) // Replace 'fieldToSort' with the actual field name you want to sort by
+        .toArray();
+    
       res.send(result);
-    })
+    });
+    
 
     app.get('/mytoys', async(req, res) => {
       const cursor = toysCollection.find();
@@ -86,7 +115,12 @@ async function run() {
       const updatedToyDetails ={
         $set: {
           toyName: req.body.toyName, 
-          categoryName: req.body.toyName, 
+          categoryName: req.body.categoryName, 
+          img: req.body.img, 
+          price: req.body.price, 
+          quantity: req.body.quantity, 
+          rating: req.body.rating, 
+          description: req.body.description,          
         }
       }
       const result = await toysCollection.updateOne(filter, updatedToyDetails);
