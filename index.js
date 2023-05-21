@@ -29,10 +29,9 @@ async function run() {
 
     const toysCollection = client.db('miniWheels').collection('toyList');
 
-    const indexKeys = {toyName: 1, categoryName: 1};
-    const indexOptions = {name: "nameCategory"};
-
-    const result = await toysCollection.createIndex(indexKeys, indexOptions);
+    // const indexKeys = {toyName: 1, categoryName: 1};
+    // const indexOptions = {name: "nameCategory"};
+    // const result = await toysCollection.createIndex(indexKeys, indexOptions);
 
     app.get("/toysearchTitle/:text", async (req, res) => {
       const searchText = req.params.text;
